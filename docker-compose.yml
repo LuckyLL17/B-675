@@ -1,0 +1,25 @@
+services:
+  # 前端服务
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  # 后端服务
+  backend:
+    build: ./backend
+    ports:
+      - "8000:80"
+    volumes:
+      - ./downloads:/var/www/html/imgdow
+      - ./data:/var/www/html/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
