@@ -1,5 +1,7 @@
 package com.echolink.controller;
 
+import com.echolink.common.ApiResponse;
+import com.echolink.common.ResultUtils;
 import com.echolink.model.Message;
 import com.echolink.service.MessageService;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +28,9 @@ public class MessageController {
      * POST /api/message
      */
     @PostMapping("/message")
-    public ResponseEntity<Map<String, Object>> receiveMessage(@RequestBody Message message) {
+    public ResponseEntity<ApiResponse<Void>> receiveMessage(@RequestBody Message message) {
         messageService.processMessage(message);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "消息接收成功");
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResultUtils.success("消息接收成功", null));
     }
 
     /**
@@ -41,9 +38,9 @@ public class MessageController {
      * GET /api/health
      */
     @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> health() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "UP");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<Map<String, String>>> health() {
+        Map<String, String> data = new HashMap<>();
+        data.put("status", "UP");
+        return ResponseEntity.ok(ResultUtils.success(data));
     }
 }
