@@ -1,12 +1,14 @@
 package com.echolink.controller;
 
+import com.echolink.common.ApiResponse;
+import com.echolink.common.ResultCode;
+import com.echolink.common.ResponseUtils;
+import com.echolink.exception.BusinessException;
 import com.echolink.model.Message;
+import com.echolink.model.MessageResponse;
 import com.echolink.service.MessageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 消息 REST API 控制器
@@ -26,14 +28,13 @@ public class MessageController {
      * POST /api/message
      */
     @PostMapping("/message")
-    public ResponseEntity<Map<String, Object>> receiveMessage(@RequestBody Message message) {
-        messageService.processMessage(message);
+    public ResponseEntity<ApiResponse<MessageResponse>> receiveMessage(@RequestBody Message message) {
+        if (message.getContent() == null || message.getContent().trim().isEmpty()) {
+            throw new BusinessException(ResultCode.PARAM_VALID_ERROR, "消息内容不能为空");
+        }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "消息接收成功");
-
-        return ResponseEntity.ok(response);
+        MessageResponse response = messageService.processMessage(message);
+        return ResponseEntity.ok(ResponseUtils.success("消息接收成功", response));
     }
 
     /**
@@ -41,9 +42,7 @@ public class MessageController {
      * GET /api/health
      */
     @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> health() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "UP");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<String>> health() {
+        return ResponseEntity.ok(ResponseUtils.success("服务运行正常"));
     }
 }
